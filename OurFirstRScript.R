@@ -14,6 +14,7 @@ head(y) # we can see the first rows of our data frame
 # class(mydata)
 # head(mydata)
 
+install.packages("readxl")
 library(readxl)
 mydata <- read_excel("data/database_esercizio.xls", sheet = "captures")
 class(mydata)
@@ -22,6 +23,8 @@ head(mydata)
 ## ---- Extract a column (i.e. a variable) -----
 # we can do this using '$'
 y$weight_g
+length(y$weight_g)
+dim(y)
 # or subsetting the data frame, using square brackets '[ ]'
 y["weight_g"]
 y[,10] # the weight of the animals is stored in the 10th column
@@ -81,6 +84,7 @@ median(weight)
 ?boxplot # check the range argument and its default value
 boxplot(weight, range=0)
 boxplot(na.omit(y$footlength_mm))
+boxplot(weight)
 
 ## ---- Plot the data: 2) boxplot ----
 
