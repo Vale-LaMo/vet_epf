@@ -64,6 +64,9 @@ M <- eigen(t(A)) # autoanalisi sulla trasposta, per
 
 
 
+library(lefko3)
+
+install.packages("FLife", repos="https:///flr-project.org/R")
 
 B <- matrix(c(0.426, 1.290, 1.296, 1.120, 1.126, 1.554, 0,
               0.713, -1, 0, 0, 0, 0, 0,
@@ -89,9 +92,25 @@ years <- 20
 N.projections <- matrix(0, nrow = nrow(B), ncol = years + 1)
 N.projections[, 1] <- N0
 r = rep(-(lambda),years+1)
-for (i in 1:years) N.projections[, i + 1] <- B %*% N.projections[,+ i] + t((1-(colSums(N.projections)/110))[1+i]  %*% r[1+i] %*% N.projections[,+ i])
+# for (i in 1:years) N.projections[, i + 1] <- B %*% N.projections[,+ i] + t((1-(colSums(N.projections)/110)[i])  %*% r[i] %*% N.projections[,+ i])
+# matplot(0:years, rowSums(t(N.projections)), type = "l", ylab="Total no. of individuals",
+#         xlab="Years")
+for (i in 1:years) N.projections[, i + 1] <- B %*% N.projections[,+ i] + 
+  t((1-(colSums(N.projections)/110)[i])  %*% N.projections[,+ i]  %*% 1/N.projections[,i+1] %*% N.projections[,+ i])
 matplot(0:years, rowSums(t(N.projections)), type = "l", ylab="Total no. of individuals",
         xlab="Years")
 
+N.projections[,+ i]/N.projections[,-i]
+
+projection3(B, nreps=7)
 
 
+# library(FLife)
+# data(teleost)
+# 
+# teleost
+
+mats_list <- list(A,A,A)
+stagevector <- c("NB", "Y", "Ad1", "Ad2", "Ad3", "Ad4", "Ad5")
+anth_lefkoMat <- create_lM(mats_list, anthframe, hstages = NA,
+                           historical = FALSE, poporder = 1, patchorder = pch_ord, yearorder = yr_ord)
