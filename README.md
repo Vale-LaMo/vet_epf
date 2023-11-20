@@ -11,4 +11,4 @@ Argomenti: a partire dalla matrice di transizione, proiettiamo una popolazione d
 File usati: **01_exponential_growth.R**
 Slide di riferimento (solo su Moodle): **03_Parametri_demografici_ungulati.pdf**
 
-<!-- Lezione 2) matrix population models - preparare caso studio del camoscio --> 
+<!-- Lezione 3) matrix population models - preparare caso studio del camoscio --> 

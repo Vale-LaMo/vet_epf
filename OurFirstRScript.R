@@ -14,7 +14,7 @@ head(y) # we can see the first rows of our data frame
 # class(mydata)
 # head(mydata)
 
-install.packages("readxl")
+# install.packages("readxl")
 library(readxl)
 mydata <- read_excel("data/database_esercizio.xls", sheet = "captures")
 class(mydata)
@@ -111,7 +111,7 @@ sd(weight)/sqrt(119)
 ## ---- Handling data in a data frame - common operations ----
 
 # selecting subsets of data, according to their values
-library(dplyr)
+# library(dplyr)
 library(tidyverse)
 filter(y, trap_id > 43)
 # or
@@ -121,7 +121,10 @@ filter(y, trap_id < 5 | trap_id > 65)
 arrange(y, trap_id)
 
 # multiple operations
-y[,c("chip","trap_id")] %>% filter(trap_id > 65) %>% arrange(trap_id)
+y[,c("chip","trap_id")] %>% 
+  filter(trap_id > 65) %>% 
+  arrange(trap_id)
+
 select(y, chip, trap_id)
 y %>% 
   select(chip, trap_id) %>% 
@@ -131,7 +134,11 @@ y %>%
 # summarizing data within groups
 names(y)
 y$age
-y %>% group_by(age) %>% summarise(mean.w = mean(na.omit(weight_g)))
+y %>% 
+  group_by(age) %>% 
+  summarise(mean.w = mean(na.omit(weight_g)))
 y$sex
-y %>% group_by(age, sex) %>% summarise(mean.w = mean(na.omit(weight_g)))
+y %>% 
+  group_by(age, sex) %>% 
+  summarise(mean.w = mean(na.omit(weight_g)))
 
