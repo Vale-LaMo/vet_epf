@@ -1,5 +1,8 @@
-# library(lefko3)
-# install.packages("FLife", repos="https:///flr-project.org/R")
+## ---- Demographic analysis of an animal population ----
+## including density dependence
+
+# Deer matrix
+# Jensen, A. L. (1995). Simple density-dependent matrix model for population projection. Ecological Modelling 77, 43–48.
 
 B <- matrix(c(0.426, 1.290, 1.296, 1.120, 1.126, 1.554, 0,
               0.713, -1, 0, 0, 0, 0, 0,
@@ -31,19 +34,5 @@ for (i in 1:years) N.projections[, i + 1] <- N.projections[,+ i] +
   matrix(((110-N.projections[,+ i])/110),nr=7) %*% (-lambda) * (N.projections[,+ i])
 matplot(0:years, rowSums(t(N.projections)), type = "l", ylab="Total no. of individuals",
         xlab="Years")
-
-
-i=1
-eigs.B <- eigen(B)
-w <- Re(eigs.B[["vectors"]][, 1]) # più semplice, questa è la SSD
-for (i in 1:years) N.projections[, i + 1] <- B %*% N.projections[,+ i] +
-  (matrix(((110-N.projections[,+ i])/110),nr=7)) * (B %*% (N.projections[,+ i])) * (-lambda)
-matplot(0:years, t(N.projections), type = "l", lty = 1:7,
-        ylab = "Stage Abund", xlab = "Year", col = 1:7)
-legend("topleft", legend = stages,
-       lty = 1:6, bty = "n", col = 1:7)
-
-matplot(0:years, (colSums(N.projections)), type = "l", lty = 1,
-        ylab = "Stage Abund", xlab = "Year", col = 1)
 
 
