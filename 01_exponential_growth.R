@@ -13,7 +13,6 @@ A <- matrix(c(0.426, 1.290, 1.296, 1.120, 1.126, 1.554, 0,
               0, 0, 0, 0, 0.563, 0, 0,
               0, 0, 0, 0, 0, 0.777, 0), 
             nr = 7, byrow = TRUE)
-
 A
 
 # Partendo da una popolazione iniziale con
@@ -35,8 +34,10 @@ N.projections[, 1] <- N0
 for (i in 1:years) N.projections[, i + 1] <- A %*% N.projections[,+ i]
 
 # plottate la 
-# dinamica di tutti gli stadi per 10 anni
-matplot(0:years, rowSums(t(N.projections)), type = "l", ylab="Total no. of individuals",
+# dinamica di tutti gli stadi per 6 anni
+# matplot(0:years, rowSums(t(N.projections)), type = "l", ylab="Total no. of individuals",
+#         xlab="Years")
+matplot(0:years, colSums(N.projections), type = "l", ylab="Total no. of individuals",
         xlab="Years")
 # Determinate la distribuzione stabile di età
 eigs.A <- eigen(A)
