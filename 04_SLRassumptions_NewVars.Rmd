@@ -1,0 +1,62 @@
+---
+title: "Testare gli assunti della regressione lineare e introdurre nuove variabili"
+output: 
+  html_document: 
+    theme: paper
+    toc: yes
+    toc_float: yes
+  html_notebook: 
+    toc: yes
+    toc_float: yes
+---
+
+
+# Regressione lineare semplice: testare gli assunti
+
+Adesso andremo a verificare il rispetto degli assunti della regressione che abbiamo fatto tra la longevità degli animali, e la densità nell'anno della nascita. Sappiamo che il modello che abbiamo fittato è un oggetto complesso, che contiene molte informazioni. Possiamo ad esempio estrarre i residui del modello ed andare a verificare se sono verificate le condizioni per l'analisi che abbiamo appena effettuato.    
+Dopo aver riletto e preparato i dati, e fittato il modello:   
+
+
+```{r dataprep-modelfitting}
+
+mydata <- read_excel("data/CawRidge_LifetimeData.xlsx")
+head(mydata)
+mydata$densityYOB <- as.numeric(mydata$densityYOB)
+mydata %>% 
+  dplyr::select(densityYOB, longevity, ALR) %>% 
+  mutate(repr = "yes") %>% 
+  na.omit() -> mydata
+mydata$repr[mydata$ALR == "never"] <- "no"
+mydata$repr <- as.factor(mydata$repr)
+mydata %>% 
+  filter(repr == "yes") -> mydata_repr
+mydata %>% 
+  filter(repr == "no") -> mydata_norepr
+mod <- lm(longevity ~ densityYOB, data = mydata_repr)
+
+```
+
+possiamo proceere con l'estrazione dei residui e possiamo rappresentarli graficamente:
+
+```{r SLRresiduals}
+
+residuals(mod)
+par(mfrow=c(1,3))
+hist(residuals(mod))
+boxplot(residuals(mod))
+qqnorm(residuals(mod))
+qqline(residuals(mod))
+par(mfrow=c(1,1))
+
+```
+
+In generale, il comando `plot` applicato al modello ci permette poi di ottenere tutti i plot diagnostici:
+
+```{r plotSLR}
+
+plot(mod)
+
+```
+
+Dall'analisi dei plot, non sembrano esserci eccessive violazioni degli assunti. Tuttavia, notiamo che ci sono dei pattern nei residui e in particolare che questi non sono distribuiti normalmente. In effetti, la longevità è misurata in termini di numero di anni. Si tratta quindi di un **conteggio** del numero di anni, e questo implica che l'analisi può essere meglio condotta adottando un'altra distribuzione dei dati come riferimento, anziché una distribuzione normale.
+

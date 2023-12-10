@@ -1,0 +1,223 @@
+---
+title: "Analisi di regressione in R"
+output:
+  word_document: 
+    toc: yes
+  html_document:
+    theme: paper
+    toc: yes
+    toc_float: yes
+---
+
+```{r packages}
+library(tidyverse)
+library(readxl)
+library(HH)
+```
+
+
+Per questa analisi, usiamo un dataset relativo allo studio di Panagakis et al. (2017), nel quale gli autori analizzano l'effetto dell'età di prima riproduzione (AFR, *Age of First Reproduction*) su *early reproductive success*, longevità, *late reproductive success* e sui tassi di senescenza, tenendo contemporaneamente conto delle condizioni ambientali natali (*density at birth*) e della qualità individuale.
+Lo studio è condotto sulla capra delle nevi, in Canada (*Canadian Rocky Mountains, west-central Alberta*).
+
+Come prima cosa, verifichiamo appunto la presenza di effetti della densità alla nascita sulla longevità degli animali. Ci interessa anche sapere se questo effetto è diverso per gli animali che si riproducono e gli animali che non si riproducono.
+
+# Uno sguardo ai dati
+
+Come prima cosa, usiamo la funzione `read_excel` per caricare i dati:
+
+```{r data}
+mydata <- read_excel("data/CawRidge_LifetimeData.xlsx")
+head(mydata)
+# table(is.na(mydata$densityYOB))
+```
+
+```{r}
+mydata$densityYOB <- as.numeric(mydata$densityYOB)
+# table(is.na(mydata$densityYOB))
+```
+
+
+Le variabili che ci interessano sono `densityYOB` (*density at the Year Of Birth*) e `longevity`. Usiamo inoltre la colonna `ALR` (*Age at last reproduction; never=known to never reproduce*) per discriminare tra le femmine che si sono riprodotte almeno una volta e quelle che non si sono mai riprodotte. Creo a questo scopo una variabile *ad hoc*, che divide gli animali in due gruppi:
+
+```{r repr-vs-norepr}
+mydata %>% 
+  dplyr::select(densityYOB, longevity, ALR) %>% 
+  mutate(repr = "yes") %>% 
+  na.omit() -> mydata
+mydata$repr[mydata$ALR == "never"] <- "no"
+mydata$repr <- as.factor(mydata$repr)
+
+mydata %>% 
+  filter(repr == "yes") -> mydata_repr
+mydata %>% 
+  filter(repr == "no") -> mydata_norepr
+```
+
+
+# Confronto tra le longevità medie dei due gruppi: t-test e intervalli di confidenza
+
+Attenzione! Ricordiamoci che per fare un t-test, devono essere rispettati gli assunti (dati continui, dati normali per ciascun gruppo, varianze omogenee)
+
+```{r ttest}
+mydata %>% 
+  group_by(repr) %>% 
+  summarise(media = mean(longevity),
+            varianza = var(longevity))
+
+boxplot(longevity ~ repr, data = mydata)
+t.test(longevity ~ repr, data = mydata, var.equal = FALSE)
+```
+
+```{r}
+mydata %>% 
+  group_by(repr) %>% 
+  summarise(media = mean(longevity),
+            SE = sd(longevity) / sqrt(length(longevity)),
+            n = n()) %>% 
+  rowwise() %>% 
+  mutate(lcl = (media + qt( c(0.05, 0.95), n - 1) * SE)[1],
+         ucl = (media + qt( c(0.05, 0.95), n - 1) * SE)[2]) -> intervalli
+intervalli
+```
+
+```{r}
+# Default line plot
+p <- ggplot(intervalli, aes(x=repr, y=media, color=repr)) + 
+  # geom_line() +
+  geom_point()+
+  geom_errorbar(aes(ymin=lcl, ymax=ucl), width=.2,
+                 position=position_dodge(0.05))
+print(p)
+# Finished line plot
+p+labs(title="Longevity per group", x="Reproduction", y = "Longevity")+
+   theme_classic() +
+   scale_color_manual(values=c('#999999','#E69F00'))
+```
+
+
+# Analisi di regressione
+
+R stima la retta di regressione linear con la funzione *lm*.   
+
+```{r regression}
+mod <- lm(longevity ~ densityYOB, data = mydata_repr)
+names(mod)
+coef(mod)
+```
+
+Visualizziamo i dati:
+
+```{r regressionplot}
+
+plot(longevity ~ densityYOB, data = mydata_repr, pch = 16)
+abline(coef(mod), col="red", lwd=2)
+summary(mod)
+
+```
+
+
+## Esercizio
+
+1) Interpretiamo la pendenza
+
+2) Interpretiamo l'intercetta
+
+3) Usiamo la retta di regressione per ottenere una stima puntuale della longevità media di un animale che è nato in un anno in cui la densità era pari a 130.
+
+```{r pointestimate}
+
+20.88 + (-0.085) * (130) # point estimate
+
+```
+
+# Valori fittati e valori predetti
+
+La stima di *Y* per un valore di *x* che corrisponde a un valore osservato è detta *fitted value*.    
+
+```{r fittedvalues}
+
+fitted(mod)
+plot(longevity ~ densityYOB, data = mydata_repr, pch = 16)
+abline(coef(mod), col="red")
+points(mydata_repr$densityYOB, fitted(mod), col="red", pch=19)
+
+```
+
+Le previsioni di *Y* in corrispondenza dei valori di *x* che non sono necessariamente parte dei dati osservati vengono fatte usando la funzione *predict*:
+
+```{r predictedvalues}
+
+predict(mod, newdata = data.frame(densityYOB = c(90,118,130)))
+plot(longevity ~ densityYOB, data = mydata_repr, pch = 16)
+abline(coef(mod), col="red")
+points(mydata_repr$densityYOB, fitted(mod), col="red", pch=19)
+points(c(90,118,130),
+       predict(mod, newdata = data.frame(densityYOB = c(90,118,130))),
+       col="blue", pch=19)
+```
+
+
+# Residui
+
+I residui del modello possono essere visualizzati con la funzione *residuals*:
+
+```{r residuals}
+
+residuals(mod)
+# Residual standard error
+modsumry <- summary(mod)
+modsumry$sigma
+
+```
+
+
+# Sintesi del modello
+
+```{r lmsummary}
+
+summary(mod)
+
+```
+
+Nella sezione *Coefficients* troviamo le stime dei parametri e i loro errori standard, rispettivamente nella seconda e terza colonna. Possiamo anche ottenere gli intervalli di confidenza al 95%:
+
+```{r coefconfidenceintervals}
+
+confint(mod)
+
+```
+
+Questi sono gli intervalli di confidenza per i parametri, ma, in generale, quanto sono buone le nostre sitme di *Y*? Quanto 'crediamo' al nostro modello?
+
+```{r confidencebands}
+
+ci.plot(mod)
+
+```
+Notate che abbiamo due tipi di intervalli di confidenza. L'intervallo di confidenza è riferito alla media, mentre l'intervallo della *prediction* fa riferimento al singoo valore.
+
+## Tipi di intervalli di confidenza
+
+I seguenti sono i tipi di intervalli di confidenza utilizzati per le previsioni nella regressione e in altri modelli lineari:
+
+* Intervallo di previsione (*prediction interval*) - Fornisce un intervallo di valori probabili per una singola risposta.
+* Intervallo di confidenza della previsione - Fornisce un intervallo di valori probabili per la risposta media.
+
+**Un intervallo di previsione è un intervallo che probabilmente conterrà il valore di risposta di una singola nuova osservazione, date le impostazioni specificate dei predittori nel modello **.
+
+L'intervallo di confidenza del 95% della previsione è più ristretto: si può essere sicuri al 95% che questo intervallo includa la risposta media di tutte gli animali che nascono ad una data densità.
+**L'intervallo di confidenza della previsione è un intervallo che probabilmente contiene la risposta media, date le impostazioni specificate dei predittori nel modello. Proprio come gli intervalli di confidenza regolari, l'intervallo di confidenza della previsione presenta un intervallo per la media piuttosto che la distribuzione dei singoli punti di dati**.
+
+L'intervallo di previsione è sempre più ampio dell'intervallo di confidenza a causa dell'incertezza aggiuntiva che comporta la previsione di una singola risposta rispetto alla risposta media.
+
+## R2
+
+Esistono diverse definizioni di R2 che solo a volte sono equivalenti. Quando è inclusa un'intercetta, è semplicemente il quadrato del coefficiente di correlazione campionaria (cioè r) tra gli esiti osservati e i valori osservati dei predittori. Se si includono ulteriori regressori, R2 è il quadrato del coefficiente di correlazione multipla. In entrambi i casi, il coefficiente di determinazione varia da 0 a 1.
+
+L'uso di un R2 aggiustato è un tentativo di tenere conto del fenomeno dell'aumento automatico e spurio dell'R2 quando al modello vengono aggiunte ulteriori variabili esplicative. Si tratta di una modifica dell'R2 che aggiusta il numero di termini esplicativi in un modello rispetto al numero di punti dati. L'R2 corretto può essere negativo e il suo valore sarà sempre inferiore o uguale a quello dell'R2. A differenza dell'R2, l'R2 corretto aumenta solo quando l'aumento dell'R2 (dovuto all'inclusione di una nuova variabile esplicativa) è superiore a quello che ci si aspetterebbe di vedere per caso.
+
+## I gradi di libertà
+
+* Gradi di libertà corretti per il modello: parametri - 1
+* Gradi di libertà per l'errore: numero di dati - parametri
+
