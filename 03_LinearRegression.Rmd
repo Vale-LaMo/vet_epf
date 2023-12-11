@@ -10,7 +10,8 @@ output:
 ---
 
 ```{r packages}
-library(tidyverse)
+# library(tidyverse)
+library(dplyr)
 library(readxl)
 library(HH)
 ```
@@ -67,6 +68,7 @@ mydata %>%
 boxplot(longevity ~ repr, data = mydata)
 t.test(longevity ~ repr, data = mydata, var.equal = FALSE)
 ```
+Calcoliamo gli intervalli di confidenza:
 
 ```{r}
 mydata %>% 
@@ -75,8 +77,8 @@ mydata %>%
             SE = sd(longevity) / sqrt(length(longevity)),
             n = n()) %>% 
   rowwise() %>% 
-  mutate(lcl = (media + qt( c(0.05, 0.95), n - 1) * SE)[1],
-         ucl = (media + qt( c(0.05, 0.95), n - 1) * SE)[2]) -> intervalli
+  mutate(lcl = (media + qt( c(0.025, 0.975), n - 1) * SE)[1],
+         ucl = (media + qt( c(0.025, 0.975), n - 1) * SE)[2]) -> intervalli
 intervalli
 ```
 

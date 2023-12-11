@@ -1,0 +1,73 @@
+---
+title: "Analisi demografica di una popolazione reintrodotta di cervo"
+subtitle: con effetto della densità dipendenza
+output:
+  word_document: default
+  html_notebook: default
+---
+
+# Caso studio
+
+Questo esempio di analisi demografica si basa su un caso studio descritto in  Jensen, A. L. (1995). *Simple density-dependent matrix model for population projection.* Ecological Modelling **77**, 43–48.  
+
+## La matrice di transizione
+
+La matrice di transizione che descrive la dinamica di popolazione è la seguente:
+
+```{r}
+B <- matrix(c(0.426, 1.290, 1.296, 1.120, 1.126, 1.554, 0,
+              0.713, -1, 0, 0, 0, 0, 0,
+              0, 0.645, -1, 0, 0, 0, 0,
+              0, 0, 0.648, -1, 0, 0, 0,
+              0, 0, 0, 0.560, -1, 0, 0,
+              0, 0, 0, 0, 0.563, -1, 0,
+              0, 0, 0, 0, 0, 0.777, -1), 
+            nr = 7, byrow = TRUE)
+
+B
+```
+Assegniamo dei nomi ai diversi stadi (righe e colonne) della matrice di transizione:   
+
+```{r}
+stages <- c("Newborns", "Yearlings", "Juveniles", "Adult1", "Adult2", "Adult3", "Adult3")
+```
+
+Uso la funzione *eigen* per calcolare il valore di lambda (tasso di incremento) della mia popolazione di cervo:   
+
+```{r}
+# Determinate lambda
+eigs.B <- eigen(B)
+lambda <- Re(eigs.B[["values"]][1])
+lambda
+```
+
+
+# Simulazione della dinamica di popolazione
+
+Partendo da una popolazione iniziale con un certo numero di animali per ogni classe di età, vado a plottare la dinamica di popolazione per un periodo di 20 anni.   
+Per prima cosa creo un vettore N0, che rappresenta la popolazione iniziale, in cui ho soltanto 4 femmine di 1 anno di età. La mia matrice di transizione rappresenta la dinamica della componente femminile della popolazione.
+
+```{r}
+N0 <- matrix(c(0, 4, 0, 0, 0, 0, 0), ncol = 1)
+# N0
+years <- 20 # anni di simulazione
+# years
+N.projections <- matrix(0, nrow = nrow(B), ncol = years + 1) # matrice vuota per i risultati
+N.projections[, 1] <- N0
+N.projections
+```
+Uso un ciclo *for* per proiettare nel futuro la popolazione. Il ciclo *for* mi permette di ripetere lo stesso calcolo per un determinato numero di volte, corrispondenti al numero di anni di simulazione:   
+
+```{r}
+for (i in 1:years) N.projections[, i + 1] <- N.projections[,+ i] + 
+  matrix(((110-N.projections[,+ i])/110),nr=7) %*% (-lambda) * (N.projections[,+ i])
+N.projections
+```
+
+Rappresento graficamente il risultato:
+
+```{r}
+matplot(0:years, rowSums(t(N.projections)), type = "l", ylab="Total no. of females",
+        xlab="Years")
+```
+

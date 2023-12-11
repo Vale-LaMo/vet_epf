@@ -17,7 +17,7 @@ File usati: **02_density_dep_dynamics.R**
 Slides di riferimento (su Moodle): **04_densita_dipendenza.pdf**, **05_analisi_demografica_applicata.pdf**
 
 Esercitazione 4) analisi di regressione
-Argomenti: esempio di analisi di regressione applicata a dati di life histori della capra delle nevi - effetto della densità alla nascita su probabilità di riproduzione
+Argomenti: esempio di analisi di regressione applicata a dati di life history della capra delle nevi - effetto della densità alla nascita su longevità
 File usati: **03_LinearRegression.Rmd**
 Slide di riferimento (su Moodle): **06_analisi_statistiche.pdf**
 
