@@ -99,7 +99,7 @@ p+labs(title="Longevity per group", x="Reproduction", y = "Longevity")+
 
 # Analisi di regressione
 
-R stima la retta di regressione linear con la funzione *lm*.   
+R stima la retta di regressione lineare con la funzione *lm*.   
 
 ```{r regression}
 mod <- lm(longevity ~ densityYOB, data = mydata_repr)

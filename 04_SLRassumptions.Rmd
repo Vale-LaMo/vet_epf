@@ -1,5 +1,5 @@
 ---
-title: "Testare gli assunti della regressione lineare e introdurre nuove variabili"
+title: "Testare gli assunti della regressione lineare"
 output: 
   html_document: 
     theme: paper
@@ -9,6 +9,14 @@ output:
     toc: yes
     toc_float: yes
 ---
+
+
+```{r packages}
+# library(tidyverse)
+library(dplyr)
+library(readxl)
+library(HH)
+```
 
 
 # Regressione lineare semplice: testare gli assunti
@@ -36,7 +44,7 @@ mod <- lm(longevity ~ densityYOB, data = mydata_repr)
 
 ```
 
-possiamo proceere con l'estrazione dei residui e possiamo rappresentarli graficamente:
+possiamo procedere con l'estrazione dei residui e possiamo rappresentarli graficamente:
 
 ```{r SLRresiduals}
 
@@ -58,5 +66,10 @@ plot(mod)
 
 ```
 
-Dall'analisi dei plot, non sembrano esserci eccessive violazioni degli assunti. Tuttavia, notiamo che ci sono dei pattern nei residui e in particolare che questi non sono distribuiti normalmente. In effetti, la longevità è misurata in termini di numero di anni. Si tratta quindi di un **conteggio** del numero di anni, e questo implica che l'analisi può essere meglio condotta adottando un'altra distribuzione dei dati come riferimento, anziché una distribuzione normale.
+Dall'analisi dei plot, non sembrano esserci eccessive violazioni degli assunti. Tuttavia, notiamo che ci sono dei pattern nei residui e in particolare che questi non sono distribuiti normalmente. In effetti, la longevità è misurata in termini di numero di anni. Si tratta quindi di un **conteggio** del numero di anni, e questo implica che l'analisi può essere meglio condotta adottando un'altra distribuzione dei dati come riferimento, anziché una distribuzione normale (vedremo come in una esercitazione successiva!).
+
+```{r}
+shapiro.test(mod$residuals)
+```
+
 
