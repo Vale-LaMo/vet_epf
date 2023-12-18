@@ -15,7 +15,6 @@ output:
 # library(tidyverse)
 library(dplyr)
 library(readxl)
-library(HH)
 ```
 
 
@@ -49,12 +48,12 @@ possiamo procedere con l'estrazione dei residui e possiamo rappresentarli grafic
 ```{r SLRresiduals}
 
 residuals(mod)
-par(mfrow=c(1,3))
+par(mfrow=c(1,3)) # 3 grafici sulla stessa linea
 hist(residuals(mod))
 boxplot(residuals(mod))
 qqnorm(residuals(mod))
 qqline(residuals(mod))
-par(mfrow=c(1,1))
+par(mfrow=c(1,1)) # un grafico alla volta
 
 ```
 

@@ -42,3 +42,9 @@ far fare esercitazione in autonomia su modello binomiale: whether the probabilit
 
 Esercitazione 5) analisi di regressione
 Argomenti: LONGEVITà VS DENSITY AT BIRTH DISTINGUENDO TRA ANIMALI CHE SI SONO RIPRODOTTI E NON
+
+
+metodi per seconda parte del corso:
+- distance sampling (modelli DSM)
+- CMR
+- occupancy models

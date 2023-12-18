@@ -51,7 +51,7 @@ summary(mod_v1)
 Confrontate questo grafico con quello che avevemo ottenuto sulle sole femmine che si erano riprodotte, e inoltre notate, nell'output precedente, il valore di R2, che è decisamente basso.
 
 ```{r plot_model_mod-v1}
-plot_model(mod_v1, type = "eff")
+plot_model(mod_v1, type = "eff", terms = "densityYOB")
 ```
 
 
@@ -64,8 +64,14 @@ summary(mod_v2)
 
 In generale, il comando `plot` applicato al modello ci permette poi di ottenere tutti i plot diagnostici:
 
+```{r}
+plot(mod_v2)
+```
+
+
 ```{r plot_model_mod-v2}
-plot_model(mod_v2, type = "eff")
+plot_model(mod_v2, type = "eff", terms = "densityYOB")
+plot_model(mod_v2, type = "eff", terms = "repr")
 ```
 
 Come vediamo, in questo caso abbiamo sempre un'unica retta di regressione che descrive il decremento della longevità all'aumentare della densità nell'anno di nascita. Ma sappiamo che la longevità dipende anche dalla riproduzione.
