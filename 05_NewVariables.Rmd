@@ -1,11 +1,11 @@
 ---
 title: "Regressione lineare: aggiungere variabili esplicative"
 output: 
-  html_document: 
-    theme: paper
+  html_notebook: 
     toc: yes
     toc_float: yes
-  html_notebook: 
+  html_document: 
+    theme: paper
     toc: yes
     toc_float: yes
 ---
@@ -43,7 +43,7 @@ Fittiamo ora il modello di base ai dati:
 
 ```{r model-v1}
 mod_v1 <- lm(longevity ~ densityYOB, data = mydata)
-plot(longevity ~ densityYOB, data = mydata_repr, pch = 16)
+plot(longevity ~ densityYOB, data = mydata, pch = 16)
 abline(coef(mod_v1), col="red", lwd=2)
 summary(mod_v1)
 ```

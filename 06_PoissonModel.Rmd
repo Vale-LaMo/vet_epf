@@ -1,0 +1,133 @@
+---
+title: "GLM: regressione poissoniana e selezione del modello migliore"
+output: 
+  html_notebook: 
+    toc: yes
+    toc_float: yes
+  html_document: 
+    theme: paper
+    toc: yes
+    toc_float: yes
+---
+
+```{r packages}
+# library(tidyverse)
+library(dplyr)
+library(readxl)
+# library(HH)
+library(sjPlot)
+```
+
+
+# Modello poissoniano
+
+Consideriamo sempre il dataset usato negli esempi precedenti, relativo allo studio di Panagakis et al. (2017). In questo studio, sono considerate 142 femmine di capra delle nevi, di cui 29 non si sono mai riprodotte.   
+Ci concentriamo sulla longevità degli animali, che come abbiamo detto dipende da molti fattori che agiscono contemporaneamente - la densità nell'anno di nascita è soltanto uno di questi. Altre variabili che influenzano la longevità come abbiamo visto sono il fatto che le femmine si siano riprodotte oppure no (variabile esplicativa dicotomica).   
+Per verificare se la longevità degli animali sia influenzata dalla *early reproductive allocation*, gli autori considerano quindi sia questa variabile, sia la densità alla nascita e la qualità degli animali. Queste variabili possono agire in modo additivo tra loro, o anche in interazione con la riproduzione.
+
+<!-- Per vedere se la probabilità di morire prima della riproduzione è influenzata dalla qualità degli animali e dalla densità degli animali, gli autori invece fittano un modello binomiale con logit link. -->
+
+Rileggiamo e prepariamo di nuovo i dati: 
+
+```{r dataprep}
+mydata <- read_excel("data/CawRidge_LifetimeData.xlsx")
+head(mydata)
+mydata$densityYOB <- as.numeric(mydata$densityYOB)
+mydata$quality <- as.numeric(mydata$quality)
+mydata %>% 
+  dplyr::select(densityYOB, longevity, ALR, quality) %>% 
+  mutate(repr = "yes") %>% 
+  na.omit() -> mydata
+mydata$repr[mydata$ALR == "never"] <- "no"
+mydata$repr <- as.factor(mydata$repr)
+```
+
+Prima di decidere esattamenete che modello fittare, diamo un'occhiata alle relazioni che intercorrono tra la variabile dipendente e le variabili esplicative:
+
+```{r}
+plot(mydata)
+```
+Le relazioni tra la longevità e la densità e tra la longevità e la qualità degli animali non sono chiarissime, per cui potrebbero anche non essere lineari. Per questo le due variabili esplicative (densità alla nascita e qualità degli animali) saranno inserite nel modello come termini al quadrato.
+
+Fittiamo ora il modello di base ai dati - in questo caso faremo anche un esercizio di *model selection*, per cui partiremo dal modello più complesso possibile, il cosiddetto *beyond optimal model*:
+
+```{r model-v1}
+mod_v1 <- glm(longevity ~ poly(densityYOB, degree = 2)*repr + poly(quality, degree = 2)*repr, 
+              data = mydata,
+             family = "poisson")
+summary(mod_v1)
+```
+
+Confrontate questo grafico con quello che avevemo ottenuto sulle sole femmine che si erano riprodotte, e inoltre notate, nell'output precedente, il valore di R2, che è decisamente basso.
+
+```{r plot_model_mod-v1}
+plot_model(mod_v1)
+```
+Questo risultato ci dice che secondo il nostro primo modello, c'è un effetto della densità nell'anno di nascita sulla longevità, e che questo effetto cambia a seconda dell'attività riproduttiva.
+
+```{r plot_model_mod-v1_density}
+plot_model(mod_v1, type = "eff", terms = c("densityYOB","repr"))
+```
+Se invece consideriamo la qualità degli animali, vediamo che non c'è un effetto di interazione:
+
+```{r plot_model_mod-v1_quality}
+plot_model(mod_v1, type = "eff", terms = c("quality","repr"))
+```
+In entrambi i casi però gli effetti di qualità e densità non sembrano lineari.    
+In ogni caso, annotiamo il valore di AIC di questo modello:
+
+```{r mod-v1-AIC}
+(AIC(mod_v1) -> AIC_mod1)
+```
+Sembra che comunque possiamo semplificare un po' il modello. Testiamo ora le strutture più semplici.
+
+```{r model-v2}
+mod_v2 <- glm(longevity ~ poly(densityYOB, degree = 2)*repr + poly(quality, degree = 2), 
+             data = mydata,
+             family = "poisson")
+summary(mod_v2)
+```
+
+```{r plot_model_mod-v2}
+plot_model(mod_v2)
+```
+
+```{r plot_model_mod-v2_density}
+plot_model(mod_v2, type = "eff", terms = c("densityYOB","repr"))
+```
+
+```{r plot_model_mod-v2_quality}
+plot_model(mod_v2, type = "eff", terms = c("quality"))
+```
+
+```{r mod-v2-AIC}
+(AIC(mod_v2) -> AIC_mod2)
+```
+
+Pensate a tutte le strutture possibili di modelli e salvate i valori relativi di AIC:
+
+```{r model-v3}
+mod_v3 <- lm(longevity ~ poly(densityYOB, degree = 2)*repr + poly(quality, degree = 2), data = mydata)
+summary(mod_v3)
+```
+
+```{r plot_model_mod-v3}
+plot_model(mod_v3)
+```
+
+```{r plot_model_mod-v3_density}
+plot_model(mod_v3, type = "eff", terms = c("densityYOB","repr"))
+```
+
+
+```{r plot_model_mod-v3_quality}
+plot_model(mod_v3, type = "eff", terms = c("quality","repr"))
+```
+
+
+```{r mod-v3-AIC}
+AIC(mod_v3)
+```
+
+
+

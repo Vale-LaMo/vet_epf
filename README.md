@@ -21,7 +21,7 @@ Argomenti: esempio di analisi applicata a dati di life history della capra delle
 File usati: **03_LinearRegression.Rmd**
 Slide di riferimento (su Moodle): **06_analisi_statistiche.pdf**
 
-Esercitazione 5) analisi di refressione semplice
+Esercitazione 5) analisi di regressione semplice
 Argomenti: esempio di analisi di regressione applicata a dati di life history della capra delle nevi - effetto della densità alla nascita su longevità
 File usati: **03_LinearRegression.Rmd**
 Slide di riferimento (su Moodle): **06_analisi_statistiche.pdf**
@@ -31,20 +31,24 @@ Argomenti: esempio di plot per verificare il rispetto degli assunti e test di sh
 File usati: **04_SLRassumption.Rmd**, **05_NewVariables.Rmd**
 Slide di riferimento (su Moodle): **07_assunti.pdf**
 
-
-Argomenti successivi:
-modello poissoniano e model selection sulla base dell'AIC (sempre stesso dataset)
+Esercitazione 7) modello poissoniano e model selection sulla base Argomenti: esempio di modello poissoniano che mette in relazione al longevità degli animali con la densità nell'anno della nascita, la qualità degli animali, e l'avvenuta (o meno) riproduzione - si ripetono le strutture dei modelli proposte nella Tabella 1 di Panagakis et al. (2017) e si fa un esempio di model selection sulla base dell'AIC
+File usati: **06_PoissonModel.Rmd*
+Slide di riferimento (su Moodle): **08_GLM.pdf**
 
 Nuovo dataset:
 far fare esercitazione in autonomia su modello binomiale: whether the probability of dying before reproduction was influenced by female quality and density at birth using a GLM with a binomial distribution and a logit link.
 
 
 
-Esercitazione 5) analisi di regressione
-Argomenti: LONGEVITà VS DENSITY AT BIRTH DISTINGUENDO TRA ANIMALI CHE SI SONO RIPRODOTTI E NON
-
-
 metodi per seconda parte del corso:
 - distance sampling (modelli DSM)
 - CMR
 - occupancy models
+
+
+Approfondimenti su censimenti, indici di abbondanza e stime di densità di popolazioni di animali selvatici, in particolare distinguendo tra il "processo ecologico" e il "processo di osservazione" dei fenomeni naturali.
+Definizione di "precisione" e "accuratezza" in ambito statistico.
+Cenni sui metodi di campionamento delle specie: distance sampling, cattura marcatura, N-mixture model etc.
+Definizione e uso degli "indicatori ecologici" nella gestione della fauna selvatica.
+
+
