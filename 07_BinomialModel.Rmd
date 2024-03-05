@@ -1,0 +1,154 @@
+---
+title: "GLM: regressione poissoniana e selezione del modello migliore"
+output: 
+  html_notebook: 
+    toc: yes
+    toc_float: yes
+  html_document: 
+    theme: paper
+    toc: yes
+    toc_float: yes
+---
+
+```{r packages}
+# library(tidyverse)
+library(dplyr)
+library(readxl)
+# library(HH)
+library(sjPlot)
+```
+
+
+# Variabile dipendente e ipotesi da testare
+
+Considerando sempre lo studio di Panagakis et al. (2017) - 142 femmine di capra delle nevi, di cui 29 non si sono mai riprodotte, vediamo che gli autori non analizzano soltnato l'effetto delle variabili esplicative sulla longevità, ma testano anche l'effetto delle variabili esplicative sul fatto che un animale si sia riprodotto o meno.    
+Nello specificano, testano l'ipotesi che il fatto di essere morte prima di riprodursi sia legato alla qualità dell'animale stesso e dalla densità alla nascita.
+
+Rileggiamo e prepariamo di nuovo i dati: 
+
+```{r dataprep}
+mydata <- read_excel("data/CawRidge_LifetimeData.xlsx")
+head(mydata)
+mydata$densityYOB <- as.numeric(mydata$densityYOB)
+mydata$quality <- as.numeric(mydata$quality)
+mydata %>% 
+  dplyr::select(densityYOB, longevity, ALR, quality) %>% 
+  mutate(repr = 1) %>% 
+  na.omit() -> mydata
+mydata$repr[mydata$ALR == "never"] <- 0
+# mydata$repr <- as.factor(mydata$repr)
+head(mydata)
+```
+
+Prima di decidere esattamenete che modello fittare, diamo un'occhiata alla variabile dipendente:
+
+```{r}
+hist(mydata$repr)
+```
+
+In questo caso, ci occorre un modello di tipo binomiale.
+
+# Modelli
+
+Fittiamo ora il modello di base ai dati - in questo caso faremo anche un esercizio di *model selection*, per cui partiremo dal modello più complesso possibile, il cosiddetto *beyond optimal model*:
+
+```{r model-v1}
+mod_v1 <- glm(repr ~ densityYOB * quality, 
+              data = mydata,
+             family = "binomial")
+summary(mod_v1)
+```
+Visualizziamo il risultato del modello:    
+
+```{r plot_model_mod-v1}
+plot_model(mod_v1)
+```
+
+
+
+```{r plot_model_mod-v1_density}
+plot_model(mod_v1, type = "eff", terms = c("densityYOB"))
+```
+
+
+```{r plot_model_mod-v1_quality}
+plot_model(mod_v1, type = "eff", terms = c("quality"))
+```
+```{r}
+plot_model(mod_v1, type = "eff", terms = c("quality", "densityYOB"))
+```
+
+
+
+```{r}
+AIC_mod1 <- AIC(mod_v1)
+```
+
+Continuate da soli con la model selection, usando come base quanto fatto per il modello poissoniano.
+
+
+# Aggiornamento lezione 2024-03-05
+
+```{r}
+mod_v2 <- glm(repr ~ densityYOB + quality, 
+              data = mydata,
+             family = "binomial")
+summary(mod_v2)
+plot_model(mod_v2)
+plot_model(mod_v2, type = "eff", terms = c("densityYOB"))
+plot_model(mod_v2, type = "eff", terms = c("quality"))
+AIC_mod2 <- AIC(mod_v2)
+```
+
+```{r}
+mod_v3 <- glm(repr ~ densityYOB, 
+              data = mydata,
+             family = "binomial")
+summary(mod_v3)
+plot_model(mod_v3)
+plot_model(mod_v3, type = "eff", terms = c("densityYOB"))
+AIC_mod3 <- AIC(mod_v3)
+```
+
+
+
+```{r}
+mod_v4 <- glm(repr ~ quality, 
+              data = mydata,
+             family = "binomial")
+summary(mod_v4)
+plot_model(mod_v4)
+plot_model(mod_v4, type = "eff", terms = c("quality"))
+AIC_mod4 <- AIC(mod_v4)
+```
+
+
+```{r}
+mod_v5 <- glm(repr ~ densityYOB + longevity * quality,
+              data = mydata,
+             family = "binomial")
+summary(mod_v5)
+plot_model(mod_v5)
+plot_model(mod_v5, type = "eff", terms = c("densityYOB"))
+plot_model(mod_v5, type = "eff", terms = c("longevity", "quality"))
+AIC_mod5 <- AIC(mod_v5)
+```
+
+```{r}
+mod_v6 <- glm(repr ~ densityYOB + longevity + quality,
+              data = mydata,
+             family = "binomial")
+summary(mod_v6)
+plot_model(mod_v6)
+plot_model(mod_v6, type = "eff", terms = c("densityYOB"))
+plot_model(mod_v6, type = "eff", terms = c("quality"))
+plot_model(mod_v6, type = "eff", terms = c("longevity"))
+AIC_mod6 <- AIC(mod_v6)
+```
+```{r}
+data.frame(struttura = c("mod1", "mod2", "mod3", "mod4", "mod5", "mod6"),  
+           AICvalue = c(AIC_mod1, AIC_mod2, AIC_mod3, AIC_mod4, AIC_mod5, AIC_mod6)) %>% 
+  arrange(AICvalue) %>% 
+  mutate(deltaAIC = AICvalue - first(AICvalue))
+```
+

@@ -37,6 +37,7 @@ mydata %>%
   na.omit() -> mydata
 mydata$repr[mydata$ALR == "never"] <- "no"
 mydata$repr <- as.factor(mydata$repr)
+mydata
 ```
 
 Fittiamo ora il modello di base ai dati:

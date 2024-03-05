@@ -1,0 +1,150 @@
+---
+title: "SECR - tutorial"
+output: 
+  html_notebook: 
+    toc: yes
+    toc_float: yes
+  html_document: 
+    theme: paper
+    toc: yes
+    toc_float: yes
+---
+
+```{r packages}
+library(dplyr)
+library(secr)
+```
+
+
+# Dati
+
+```{r data}
+hareCH6 <- read.capthist("data/hareCH6capt.txt",
+                         "data/hareCH6trap.txt",
+                         detector = "single")
+```
+
+```{r}
+summary(hareCH6)
+```
+
+n = numero di individui diversi rilevati in ciascuna occasione *t* (6 occasioni)    
+u = numero di individui rilevati per la prima volta in ciascuna occasione *t*    
+f = numero di individui rilevati esattamente in *t* occasioni     
+M(t+1) = numero cumulativo di individui rilevati in ciascuna occasione *t*
+
+Plot dei dati spaziali, con spezzata che unisce la catture consecutive di uno stesso individuo:
+
+```{r}
+par(mar = c(1,1,3,1)) # riduce i margini, param grafico
+plot(hareCH6, tracks = TRUE)
+```
+
+Scala spaziale (sigma) - prima stima:  
+
+```{r initial-sigma}
+initialsigma <- RPSV(hareCH6, CC = TRUE)
+cat("Quick and biased estimate of sigma =", initialsigma, "m\n")
+```
+
+La scala spaziale ci serve per definire un buffer attorno alle nostre trappole - il buffer serve a definire l'area che viene usata per stimare la densità, e deve essere abbastanza ampio affinche gli animali che sono al bordo dell'area abbiano una probabilità pari a 0 di finire nel nostro campione. Di norma, 4 per sigma è una distanza sufficiente (perché stiamo adottando una distribuzione *half-normal*, e questa soglia è definita su base empirica)
+
+```{r plot_model_mod-v1_density}
+detector(traps(hareCH6)) <- "multi"
+setNumThreads(2)	# number of cores to use
+fit <- secr.fit (hareCH6, buffer = 4 * initialsigma, trace = FALSE)
+fit
+```
+
+L'ultima tabella è quella che ci interessa di più. La stima di densità è di 1.47 lepri per ettaro, con un intervallo di confidenza di 1.14-1.89.    
+Gli altri due parametri (g0 e sigma) sono invece riferiti alla curva che descrive la diminuzione della *detection probability* all'aumentare della distanza dal centro di attività dell'animale:
+
+```{r}
+par(mar = c(4,4,1,1)) # reduce margins
+plot(fit, limits = TRUE)
+```
+
+# Verifica sul valore del buffer
+
+Come detto sopra, il valore di sigma iniziale serve a definire il buffer per la stima della densità. Verifichiamo che esso vada bene con il seguente plot:
+
+```{r}
+esa.plot(fit)
+abline(v = 4 * initialsigma, lty = 2, col = 'red')
+```
+
+che ci dice che alla distanza scelta per il buffer (indicata dalla linea tratteggiata rossa), la stima della densità ha già raggiunto un asintoto (cioè non cambia più al variare della distanza)
+
+
+# Approfondimento sulla detection function
+
+Nel modello che abbiamo appena fittato, abbiamo assunto che la probabilità di avvistare un animale diminuisca con la distanza secondo un modello *half-normal*, ma possono essere applicati altri modelli, i più comuni sono *negative exponential* e *hazard rate*
+
+```{r}
+fit.HN <- secr.fit (hareCH6, buffer = 6 * initialsigma, detectfn = 'HN', trace = FALSE)
+fit.EX <- secr.fit (hareCH6, buffer = 6 * initialsigma, detectfn = 'EX', trace = FALSE)
+fit.HR <- secr.fit (hareCH6, buffer = 6 * initialsigma, detectfn = 'HR', trace = FALSE)
+```
+
+```{r}
+fits <- secrlist(HN = fit.HN, EX = fit.EX, HR = fit.HR)
+predict(fits)
+```
+
+NB. confrontate soltanto i valori di D, perché sigma ha significato diverso a seconda dei modelli
+
+```{r}
+AIC(fits)
+```
+
+Dal confronto degli AIC vediamo che il modello selezionato sarebbe quello con la funzione *hazard rate*. Tuttavia, con questo modello la stima della densità resta sensibile all'area del buffer (non si raggiunge un asintoto):
+
+```{r}
+par(mar = c(4,4,2,2))
+esa.plot(fits, max.buffer = 6 * initialsigma)
+```
+Per questo motivo, è di solito sconsigliato l'uso della funzione *hazard rate* nel SECR, a meno che non vi sia una buona ragione ecologica per farlo (es. presenza di barriere che fanno sì che la probabilità di cattura crolli con la distanza in maniera più netta dopo un primo *plateau*).
+
+Il modello migliore, escludendo l'*hazard rate*, è quindi quello esponenziale negativo (la stima non cambia significativamente rispetto all'*half normal*).   
+
+In alternativa, possiamo anche fare un *model averaging* dei modelli:
+
+```{r}
+modelAverage(secrlist(HN = fit.HN, EX = fit.EX), criterion = "AICc")
+```
+
+# Parametri del modello SECR
+
+Nel modello di base, ogni parametro stimato è costante (D ~ 1, g0 ~ 1, sigma ~ 1), non dipende da altri parametri. Ma possiamo inserire dei predittori, o variabili esplicative, per ciascn parametro del modello SECR.
+
+Ad esempio, la probabilità di rilevare un animale (g0) può dipendere dal comportamento dell'animale stesso (che può differire dagli altri - eterogenità individuale), o dall'esperienza delle precedenti catture (risposta comportamentale). La risposta comportamentale può poi anche variare nello spazio (*b*) o essere costante per tutte le trappole (*bk*).
+
+
+```{r}
+fit.EXb <- secr.fit (hareCH6, buffer = 6 * initialsigma,
+                     detectfn = 'EX',
+                     model = g0 ~ b, trace = FALSE)
+fit.EXbk <- secr.fit (hareCH6, buffer = 6 * initialsigma,
+                      detectfn = 'EX',
+                      model = g0 ~ bk, trace = FALSE)
+fitsb <- secrlist(null = fits$EX, b = fit.EXb, bk = fit.EXbk)
+AIC(fitsb)
+```
+
+
+```{r}
+fit.EXb
+```
+
+Possiamo anche considerare altri predittori:
+
+- b:	permanent global learned response
+- bk:	permanent detector-specific learned response
+- t:	time factor (one level for each occasion)
+- T:	time trend (integer covariate 0:(S-1))
+- g:	group (as specified by ‘groups’ argument)
+- session:	session factor (one level for each session)
+
+
+Altri esempi:    
+https://www.otago.ac.nz/density/examples/index.html
