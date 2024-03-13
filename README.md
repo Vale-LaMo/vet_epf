@@ -31,23 +31,25 @@ Argomenti: esempio di plot per verificare il rispetto degli assunti e test di sh
 File usati: **04_SLRassumption.Rmd**, **05_NewVariables.Rmd**
 Slide di riferimento (su Moodle): **07_assunti.pdf**
 
-Esercitazione 7) modello poissoniano e model selection sulla base Argomenti: esempio di modello poissoniano che mette in relazione al longevità degli animali con la densità nell'anno della nascita, la qualità degli animali, e l'avvenuta (o meno) riproduzione - si ripetono le strutture dei modelli proposte nella Tabella 1 di Panagakis et al. (2017) e si fa un esempio di model selection sulla base dell'AIC
+Esercitazione 7) modello poissoniano e model selection sulla base dell'AIC
+Argomenti: esempio di modello poissoniano che mette in relazione al longevità degli animali con la densità nell'anno della nascita, la qualità degli animali, e l'avvenuta (o meno) riproduzione - si ripetono le strutture dei modelli proposte nella Tabella 1 di Panagakis et al. (2017) e si fa un esempio di model selection sulla base dell'AIC
 File usati: **06_PoissonModel.Rmd*
 Slide di riferimento (su Moodle): **08_GLM.pdf**
 
-Nuovo dataset:
-far fare esercitazione in autonomia su modello binomiale: whether the probability of dying before reproduction was influenced by female quality and density at birth using a GLM with a binomial distribution and a logit link.
+Esercitazione 8) modello binomiale
+Argomenti: esempio di modello binomiale che verifica se la probabilità di morire prima di riprodursi sia influenzata dalla qualità delle femmine e dalla densità nell'anno della nascita (dati sempre da Panagakis et al. (2017))
+File usati: **07_BinomialModel.Rmd*
+Slide di riferimento (su Moodle): **08_GLM.pdf**
 
-
+Esercitazione 9) SECR
+File usati: **08_SECR_tutorial.Rmd**, **09_SECR_stoat.Rmd**
+Slide di riferimento (su Moodle): **09_stime_popolazione.pdf**
 
 metodi per seconda parte del corso:
 - distance sampling (modelli DSM)
 - CMR
 - occupancy models
 
-
-Approfondimenti su censimenti, indici di abbondanza e stime di densità di popolazioni di animali selvatici, in particolare distinguendo tra il "processo ecologico" e il "processo di osservazione" dei fenomeni naturali.
-Definizione di "precisione" e "accuratezza" in ambito statistico.
 Cenni sui metodi di campionamento delle specie: distance sampling, cattura marcatura, N-mixture model etc.
 Definizione e uso degli "indicatori ecologici" nella gestione della fauna selvatica.
 
