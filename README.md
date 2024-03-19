@@ -42,15 +42,14 @@ File usati: **07_BinomialModel.Rmd*
 Slide di riferimento (su Moodle): **08_GLM.pdf**
 
 Esercitazione 9) SECR
-File usati: **08_SECR_tutorial.Rmd**, **09_SECR_stoat.Rmd**
+File usati: **08_SECR_tutorial.Rmd** (NON USATO: **09_SECR_stoat.Rmd**)
 Slide di riferimento (su Moodle): **09_stime_popolazione.pdf**
 
-metodi per seconda parte del corso:
-- distance sampling (modelli DSM)
-- CMR
-- occupancy models
+Esercitazione 10) Distance sampling
+File usati: **09_DS_lines_distill.Rmd**
+Slide di riferimento (su Moodle): **10_Distance_sampling.pdf**
 
-Cenni sui metodi di campionamento delle specie: distance sampling, cattura marcatura, N-mixture model etc.
-Definizione e uso degli "indicatori ecologici" nella gestione della fauna selvatica.
+Esercitazione 11) Occupancy models
+- occupancy models
 
 
