@@ -58,6 +58,7 @@ The effort, or transect length has been adjusted to recognise each transect is w
 
 ```{r,echo=TRUE}
 head(wren_lt)
+wren_lt
 ```
 
 The object `wren_lt` is a dataframe object made up of rows and columns. 
