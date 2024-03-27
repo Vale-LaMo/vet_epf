@@ -1,0 +1,11 @@
+\frametitle{Main references}
+
+\begin{itemize}
+\item Manly et al 2002 Resource selection by animals. Statistical design and analysis for field studies. Kluwer Academic Publisher
+\item Millspaugh \& Marzluff (eds) 2001 Radio tracking and animal populations. Academic Press.
+\item Gillies et al 2006 Application of random effects to the study of resource selection by animals. Journal of Animal Ecology 75:887-898
+\item Fieberg et al 2010 Correlation and studies of habitat selection: problem, red herring or opportunity? Philophical Transactions of the Royal Society B 365:2233-2244
+\item Burnham \& Anderson 2002 Model Selection and Multimodel Inference. A Practical Information-Theoretic Approach. Springer.
+\item Zuur et al 2009 Mixed effects models and extensions in ecology with R. Springer
+\end{itemize}
+

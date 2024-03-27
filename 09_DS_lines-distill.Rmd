@@ -1,5 +1,5 @@
 ---
-title: "Line transect distance sampling - wren"
+title: "Line transect distance sampling"
 output: 
   html_notebook: 
     toc: yes
@@ -10,8 +10,6 @@ output:
     toc_float: yes
 ---
 
-
-Tutorial downloaded from: https://examples.distancesampling.org/
 
 ```{r include=FALSE}
 knitr::opts_chunk$set(eval=TRUE, echo=TRUE, message=FALSE, warnings=FALSE)
