@@ -1,7 +1,7 @@
 ## ---- Data import ----
 
 # using the read.csv function
-y <- read.csv("data/captures.csv",sep=";") 
+y <- read.csv("data/captures.csv",sep=";")
 class(y) # this is a data frame
 head(y) # we can see the first rows of our data frame
 
@@ -30,6 +30,7 @@ y["weight_g"]
 y[,10] # the weight of the animals is stored in the 10th column
 # Let's ask R what kind of variable we are dealing with, using the 'class' function again
 class(y$weight_g)
+# questo mi permette di sapere che tipo di dati ci sono in...
 
 w <- y$weight_g
 w
@@ -40,8 +41,9 @@ w
 # histogram
 # the function to plot an histogram is 'hist'
 # let's see how it works
-??histogram
-?hist # this is the simplest way to get help in R! just a question mark!
+# ??histogram
+# ?hist # this is the simplest way to get help in R! just a question mark!
+hist(w)
 hist(y$weight_g, main="", xlab="Animal weigth (g)") # with default break
 hist(y$weight_g, breaks=30, main="", xlab="Animal weigth (g)") # we specified a single number giving
 # the number of cells for the histogram
@@ -81,7 +83,7 @@ range(weight)
 ## quantile
 quantile(weight) # in R, quartiles are the default for the quantile function
 median(weight)
-?boxplot # check the range argument and its default value
+#?boxplot # check the range argument and its default value
 boxplot(weight, range=0)
 boxplot(na.omit(y$footlength_mm))
 boxplot(weight)
@@ -141,4 +143,5 @@ y$sex
 y %>% 
   group_by(age, sex) %>% 
   summarise(mean.w = mean(na.omit(weight_g)))
+
 

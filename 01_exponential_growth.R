@@ -20,7 +20,7 @@ N0 <- matrix(c(0, 4, 0, 0, 0, 0, 0), ncol = 1)
 N0
 years <- 6
 
-stages <- c("Newborns", "Yearlings", "Juveniles", "Adult1", "Adult2", "Adult3", "Adult3")
+stages <- c("Newborns", "Yearlings", "Juveniles", "Adult1", "Adult2", "Adult3", "Adult4")
 
 
 ## ---- domande ----
@@ -32,7 +32,7 @@ stages <- c("Newborns", "Yearlings", "Juveniles", "Adult1", "Adult2", "Adult3", 
 N.projections <- matrix(0, nrow = nrow(A), ncol = years + 1)
 N.projections[, 1] <- N0
 for (i in 1:years) N.projections[, i + 1] <- A %*% N.projections[,+ i]
-
+N.projections
 # plottate la 
 # dinamica di tutti gli stadi per 6 anni
 # matplot(0:years, rowSums(t(N.projections)), type = "l", ylab="Total no. of individuals",

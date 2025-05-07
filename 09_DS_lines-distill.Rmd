@@ -95,7 +95,7 @@ The answer is another function `convert_units`.  Arguments to this function are
 Specify the correct arguments to this function for the winter wren data set.  *Note*: units are specified as quoted strings, singular rather than plural; e.g. "meter" rather than "meters"
 
 ```{r}
-conversion.factor <- convert_units("meter", "kilometer", "hectare")
+conversion.factor <- convert_units("meter", "kilometer", "Hectare")
 ```
 
 # Fitting a simple detection function model with `ds`
