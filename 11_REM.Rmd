@@ -1,0 +1,117 @@
+---
+title: "REM"
+output: 
+  html_notebook: 
+    toc: yes
+    toc_float: yes
+  html_document: 
+    theme: paper
+    toc: yes
+    toc_float: yes
+---
+
+```{r packages}
+library(dplyr)
+library(secr)
+```
+
+
+**Obiettivo:** Usare REM per stimare la densità della popolazione di ungulati in un'area di studio a partire dai dati delle fototrappole.
+
+# Struttura dell'esercitazione
+
+1) Pianificazione del campionamento con GIS
+2) Raccolta e simulazione dei dati
+3) Analisi con REM in R
+4) Discussione e interpretazione
+
+# 1) Pianificazione del campionamento con GIS
+
+Compito per gli studenti:
+
+- Aprire QGIS e caricare una mappa dell'area di studio
+- Creare un reticolo con celle di 1 km² e selezionare casualmente 10 siti per posizionare fototrappole
+- Salvare i punti in CSV per usarli in R.
+
+Domande:
+Qual è il criterio per scegliere i punti?
+Meglio un posizionamento casuale o stratificato (es. vicino a sentieri, fonti d’acqua)?
+
+
+# 2) Raccolta e simulazione dei dati
+
+Dati necessari per REM:
+
+𝑦: Numero di incontri con gli animali (eventi per camera)
+𝑡: Tempo totale di funzionamento delle fototrappole (in ore o giorni)
+𝑣: Velocità media degli animali (in km/h)
+𝑟: Distanza di rilevamento della fototrappola (in km)
+𝜃: Angolo di rilevamento della fototrappola (in gradi)
+
+
+Possiamo simulare un dataset fittizio:
+
+```{r}
+set.seed(123)
+
+# Creiamo un dataset simulato con 10 fototrappole
+n_cameras <- 10
+
+data_REM <- data.frame(
+  camera_id = 1:n_cameras,
+  encounters = sample(5:20, n_cameras, replace = TRUE),  # Incontri casuali
+  effort_days = sample(25:35, n_cameras, replace = TRUE), # Giorni di attivazione
+  v = rep(2.5, n_cameras),  # Velocità media degli animali in km/h
+  r = rep(0.02, n_cameras), # Distanza di rilevamento in km (20 m)
+  theta = rep(40, n_cameras) # Angolo di rilevamento in gradi
+)
+
+print(data_REM)
+```
+
+Come varia il numero di incontri tra le fototrappole?
+Quali fattori potrebbero influenzare i dati (meteo, posizione, stagionalità)?
+
+## 3) Analisi con REM in R
+
+$${D = \frac{y}{t} * \frac{1}{2vr\theta}}$$
+Dove:
+
+y/t = frequenza degli incontri (incontri per unità di tempo)
+(2vrθ) è il coefficiente che tiene conto della velocità, della distanza di rilevamento e dell'angolo
+
+```{r}
+# Funzione per calcolare la densità con REM
+calculate_REM_density <- function(y, t, v, r, theta) {
+  D <- (y / t) / (2 * v * r * (theta * pi / 180))  # Convertiamo theta in radianti
+  return(D)
+}
+
+# Calcoliamo la densità per ogni fototrappola
+data_REM$density <- with(data_REM, calculate_REM_density(encounters, effort_days, v, r, theta))
+
+# Densità media stimata nell'area
+mean_density <- mean(data_REM$density)
+print(mean_density)
+```
+
+
+# 4) Discussione
+
+Cosa succede se cambia la velocità degli animali?
+Perché l'angolo e la distanza di rilevamento influenzano la densità stimata? Discussione e interpretazione
+Vantaggi del REM
+
+Non richiede marcatura individuale
+Funziona bene per specie difficili da catturare
+Facile da implementare con fototrappole
+⚠ Limiti del REM
+
+Serve una buona stima della velocità media degli animali
+La densità può essere sovrastimata o sottostimata se le fototrappole sono mal posizionate
+Il metodo non funziona bene per specie molto sociali (es. cervi in branco)
+🎯 Conclusione
+Questa esercitazione permette agli studenti di: ✅ Pianificare un campionamento con GIS
+✅ Simulare e raccogliere dati fototrappola
+✅ Applicare un modello REM in R
+✅ Discutere applicazioni e limiti nella gestione della fauna
